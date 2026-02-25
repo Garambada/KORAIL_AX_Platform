@@ -16,8 +16,16 @@ st.set_page_config(page_title="KORAIL AX - 공통업무 AI (Powered by Solar Pro
 @st.cache_resource(show_spinner=False)
 def load_rag_engine():
     try:
+        # Streamlit Cloud 경로 문제 해결을 위해 절대 경로 확보
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        doc_path = os.path.join(base_dir, "실무보감_전철전력_요약.md")
+        
+        if not os.path.exists(doc_path):
+            st.error(f"오류: 문서를 찾을 수 없습니다. 경로: {doc_path}")
+            return None
+            
         # 1. 로드
-        loader = TextLoader("실무보감_전철전력_요약.md", encoding="utf-8")
+        loader = TextLoader(doc_path, encoding="utf-8")
         docs = loader.load()
         # 2. 청크 분할
         splitter = MarkdownTextSplitter(chunk_size=500, chunk_overlap=50)
@@ -27,7 +35,8 @@ def load_rag_engine():
         vectorstore = FAISS.from_documents(chunks, embeddings)
         return vectorstore
     except Exception as e:
-        st.error(f"지식 베이스 로딩 중 오류 발생: {e}")
+        import traceback
+        st.error(f"지식 베이스 로딩 중 치명적 오류 발생:\n{traceback.format_exc()}")
         return None
 
 def generate_solar_response(context: str, query: str) -> str:
