@@ -22,6 +22,7 @@ st.markdown("""
         height: 100vh;
         margin: 0;
         padding: 0;
+        background-color: #f8f9fa !important;
     }
     
     /* Make the workspace scrollable instead of the page */
@@ -30,6 +31,11 @@ st.markdown("""
         height: calc(100vh - 150px) !important;
         padding-top: 2rem !important;
         padding-bottom: 5rem !important;
+    }
+    
+    /* Global Text Color Fix for Light Mode */
+    p, span, div, li, strong, em {
+        color: #1e1e1e !important;
     }
     
     /* Professional Typography and Accent Colors */
@@ -43,10 +49,10 @@ st.markdown("""
     [data-testid="stChatMessage"] {
         padding: 1rem;
         border-radius: 0.5rem;
-        background-color: #f8f9fa;
-        border: 1px solid #e9ecef;
+        background-color: #ffffff !important;
+        border: 1px solid #dee2e6 !important;
         margin-bottom: 1rem;
-        color: #333333 !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     
     /* Make the main tab buttons larger and more prominent */
@@ -55,16 +61,23 @@ st.markdown("""
         font-weight: 800 !important;
         padding-top: 1rem !important;
         padding-bottom: 1rem !important;
+        background-color: transparent !important;
     }
     
     button[data-baseweb="tab"] p {
         font-size: 1.25rem !important;
         font-weight: 700 !important;
+        color: #495057 !important;
+    }
+    
+    button[data-baseweb="tab"][aria-selected="true"] p {
+        color: #0E4B75 !important;
     }
     
     /* Input box floating at bottom */
     [data-testid="stBottom"] {
         background-color: white !important;
+        border-top: 1px solid #e9ecef;
     }
 </style>
 """, unsafe_allow_html=True)
