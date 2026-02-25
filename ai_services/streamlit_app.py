@@ -13,6 +13,48 @@ os.environ["UPSTAGE_API_KEY"] = "up_mK2h7yONqSmhFo8WfFIsr35B1hy83"
 
 st.set_page_config(page_title="KORAIL AX - 공통업무 AI (Powered by Solar Pro)", page_icon="🚆", layout="centered")
 
+# Custom UI Styling (Professional GUI & Scrollable Container)
+st.markdown("""
+<style>
+    /* Hide main scrollbar and constrain height */
+    html, body, [data-testid="stAppViewContainer"] {
+        overflow: hidden !important;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Make the workspace scrollable instead of the page */
+    [data-testid="stMainBlockContainer"] {
+        overflow-y: auto !important;
+        height: calc(100vh - 150px) !important;
+        padding-top: 2rem !important;
+        padding-bottom: 5rem !important;
+    }
+    
+    /* Professional Typography and Accent Colors */
+    h1, h2, h3 {
+        color: #0E4B75 !important; /* KORAIL Blue */
+        font-family: 'Helvetica Neue', Arial, sans-serif !important;
+        font-weight: 700 !important;
+    }
+    
+    /* Chat message container refinements */
+    [data-testid="stChatMessage"] {
+        padding: 1rem;
+        border-radius: 0.5rem;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        margin-bottom: 1rem;
+    }
+    
+    /* Input box floating at bottom */
+    [data-testid="stBottom"] {
+        background-color: white !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 @st.cache_resource(show_spinner=False)
 def load_rag_engine():
     try:
