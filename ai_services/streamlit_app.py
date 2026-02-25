@@ -18,7 +18,7 @@ def load_rag_engine():
     try:
         # Streamlit Cloud 경로 문제 해결을 위해 절대 경로 확보
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        doc_path = os.path.join(base_dir, "실무보감_전철전력_요약.md")
+        doc_path = os.path.join(base_dir, "실무보감_전철전력.md") # 전체 원본 문서로 교체
         
         if not os.path.exists(doc_path):
             st.error(f"오류: 문서를 찾을 수 없습니다. 경로: {doc_path}")
