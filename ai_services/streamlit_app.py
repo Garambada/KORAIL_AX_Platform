@@ -46,6 +46,20 @@ st.markdown("""
         background-color: #f8f9fa;
         border: 1px solid #e9ecef;
         margin-bottom: 1rem;
+        color: #333333 !important;
+    }
+    
+    /* Make the main tab buttons larger and more prominent */
+    [data-baseweb="tab"] {
+        font-size: 1.2rem !important;
+        font-weight: 800 !important;
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+    
+    button[data-baseweb="tab"] p {
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
     }
     
     /* Input box floating at bottom */
@@ -118,7 +132,7 @@ def generate_solar_response(context: str, query: str) -> str:
 
 st.title("🚆 KORAIL AX - 통합 플랫폼 PoC")
 
-tab1, tab2 = st.tabs(["📑 공통업무 AI (RAG)", "📐 설계업무 AI (CAD 최적화)"])
+tab1, tab2 = st.tabs(["공통업무 AI (RAG)", "설계업무 AI (CAD 최적화)"])
 
 with tab1:
     st.markdown("### **'전철전력 실무보감'** (Upstage Solar Pro LLM)")
@@ -126,7 +140,7 @@ with tab1:
         vectorstore = load_rag_engine()
         
     if vectorstore:
-        st.success("✅ 실무보감 지식 베이스 로딩 완료!")
+        st.toast("✅ 실무보감 지식 베이스 로딩 완료!")
     else:
         st.warning("⚠️ 지식 베이스를 로딩하지 못했습니다.")
     
@@ -229,3 +243,26 @@ with tab2:
                     st.error("CAD 도면 생성 라이브러리 연동 실패")
             else:
                 st.error(f"❌ 실패: 입력하신 면적({space_width}x{space_height}) 내에서는 해당 설비들을 안전거리 규정에 맞게 모두 배치할 수 없습니다. 공간(가로/세로)을 더 넓혀주세요.")
+
+    st.markdown("---")
+    st.markdown("### 🛠️ 기타 설계업무 AI 모듈 (개발 예정)")
+    
+    with st.expander("🛤️ 송전선로 최적 노선 3D 맵핑 (Transmission Line Optimal Routing)"):
+        st.info("지형 데이터를 분석하여 환경 영향과 케이블 길이를 최소화하는 최적의 3D 송전 노선을 제안합니다.")
+        st.button("모듈 실행 (준비 중) ", key="btn_routing", disabled=True)
+        
+    with st.expander("✅ 설계-시공 규격 자동 교차 검증 (Design-Construction Spec Cross-validation)"):
+        st.info("설계도면(도면, 내역서)과 시공시방서를 비교 분석하여 누락, 불일치, 위반 항목을 자동으로 찾아냅니다.")
+        st.button("모듈 실행 (준비 중) ", key="btn_validation", disabled=True)
+        
+    with st.expander("🏛️ 내진 설계 안전성 AI 시뮬레이터 (Seismic Design Safety AI Simulator)"):
+        st.info("전력 기기 및 구조물의 재질과 무게를 기반으로 지진 발생 시의 안전성을 딥러닝 모델로 시뮬레이션합니다.")
+        st.button("모듈 실행 (준비 중) ", key="btn_seismic", disabled=True)
+        
+    with st.expander("🏢 스마트 변전소 3D BIM 모델링 (Smart Substation 3D BIM Modeling)"):
+        st.info("2D CAD 도면 및 설계 파라미터를 기반으로 유지보수에 활용 가능한 3D BIM 객체를 자동 생성합니다.")
+        st.button("모듈 실행 (준비 중) ", key="btn_bim", disabled=True)
+        
+    with st.expander("🔥 전력기기 열화상 및 수명 예측 모델링 (Thermal & Lifespan Prediction)"):
+        st.info("설비 부하량과 주변 환경 데이터를 결합하여 열화 지점(Hot-spot)을 예측하고 교체 주기를 제안합니다.")
+        st.button("모듈 실행 (준비 중) ", key="btn_thermal", disabled=True)
