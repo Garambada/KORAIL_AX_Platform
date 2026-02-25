@@ -79,6 +79,24 @@ st.markdown("""
         background-color: white !important;
         border-top: 1px solid #e9ecef;
     }
+    
+    /* Visible Custom Scrollbar for Mac/Windows */
+    ::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1; 
+        border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #0E4B75; 
+        border-radius: 8px;
+        border: 2px solid #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #0a3654; 
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -257,15 +275,16 @@ with tab2:
             else:
                 st.error(f"❌ 실패: 입력하신 면적({space_width}x{space_height}) 내에서는 해당 설비들을 안전거리 규정에 맞게 모두 배치할 수 없습니다. 공간(가로/세로)을 더 넓혀주세요.")
 
-    st.markdown("---")
-    st.markdown("### 🛠️ 기타 설계업무 AI 모듈 (개발 예정)")
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("### 🛠️ KORAIL 전철전력 설계업무 AI 확장 로드맵")
+    st.info("💡 **아래 5가지 혁신적인 AI 모듈**이 플랫폼 고도화 2단계에서 순차적으로 탑재될 예정입니다.")
     
-    with st.expander("🛤️ 송전선로 최적 노선 3D 맵핑 (Transmission Line Optimal Routing)"):
-        st.info("지형 데이터를 분석하여 환경 영향과 케이블 길이를 최소화하는 최적의 3D 송전 노선을 제안합니다.")
+    with st.expander("🛤️ 송전선로 최적 노선 3D 맵핑 (Transmission Line Optimal Routing)", expanded=True):
+        st.write("지형 데이터를 분석하여 환경 영향과 케이블 길이를 최소화하는 최적의 3D 송전 노선을 제안합니다.")
         st.button("모듈 실행 (준비 중) ", key="btn_routing", disabled=True)
         
-    with st.expander("✅ 설계-시공 규격 자동 교차 검증 (Design-Construction Spec Cross-validation)"):
-        st.info("설계도면(도면, 내역서)과 시공시방서를 비교 분석하여 누락, 불일치, 위반 항목을 자동으로 찾아냅니다.")
+    with st.expander("✅ 설계-시공 규격 자동 교차 검증 (Design-Construction Spec Cross-validation)", expanded=False):
+        st.write("설계도면(도면, 내역서)과 시공시방서를 비교 분석하여 누락, 불일치, 위반 항목을 자동으로 찾아냅니다.")
         st.button("모듈 실행 (준비 중) ", key="btn_validation", disabled=True)
         
     with st.expander("🏛️ 내진 설계 안전성 AI 시뮬레이터 (Seismic Design Safety AI Simulator)"):
