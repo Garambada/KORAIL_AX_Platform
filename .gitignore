@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+
+# Next.js / Node
+node_modules/
+.next/
+out/
+build/
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Data & DBs
+*.dxf
+*.db
+*.sqlite3
+milvus_data/
+minio_data/
+pgdata/

@@ -1,0 +1,126 @@
+version: '3.8'
+
+services:
+  # 1. Frontend Integration Dashboard
+  frontend:
+    image: node:20-alpine
+    container_name: korail_ax_frontend
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    command: ["sh", "-c", "npm install && npm run dev"]
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
+    networks:
+      - korail_net
+
+  # 2. Backend API Gateway (Spring Boot / Java)
+  gateway:
+    image: eclipse-temurin:17-jdk-alpine
+    container_name: korail_ax_gateway
+    working_dir: /app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend_java:/app
+    command: ["sh", "-c", "./gradlew bootRun"]
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/korail_ax
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=korailpass
+    networks:
+      - korail_net
+
+  # 3. AI Services (Python FastAPI)
+  ai_core:
+    image: python:3.10-slim
+    container_name: korail_ax_ai_core
+    working_dir: /app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ai_services:/app
+    command: ["sh", "-c", "pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"]
+    depends_on:
+      - postgres
+      - milvus
+    environment:
+      - DATABASE_URL=postgresql://postgres:korailpass@postgres:5432/korail_ax
+      - MILVUS_HOST=milvus
+      - MILVUS_PORT=19530
+    networks:
+      - korail_net
+
+  # 4. Postgres DB (Metadata/Configuration)
+  postgres:
+    image: postgres:15-alpine
+    container_name: korail_ax_postgres
+    environment:
+      - POSTGRES_DB=korail_ax
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=korailpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - korail_net
+
+  # 5. Milvus / Vector Database (RAG Document Search)
+  milvus:
+    image: milvusdb/milvus:v2.3.0
+    container_name: korail_ax_milvus
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    environment:
+      - ETCD_ENDPOINTS=etcd:2379
+      - MINIO_ADDRESS=minio:9000
+    depends_on:
+      - etcd
+      - minio
+    command: ["milvus", "run", "standalone"]
+    networks:
+      - korail_net
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    container_name: korail_ax_etcd
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+    command: >
+      etcd
+      -advertise-client-urls=http://127.0.0.1:2379
+      -listen-client-urls http://0.0.0.0:2379
+    networks:
+      - korail_net
+
+  minio:
+    image: minio/minio:RELEASE.2023-03-20T20-16-18Z
+    container_name: korail_ax_minio
+    environment:
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    command: server /minio_data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/minio_data
+    networks:
+      - korail_net
+
+volumes:
+  pgdata:
+  minio_data:
+
+networks:
+  korail_net:
+    driver: bridge
