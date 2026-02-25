@@ -97,7 +97,7 @@ with tab1:
     # 이전 대화 출력
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+            st.markdown(msg["content"], unsafe_allow_html=True)
     
     # 사용자 입력 처리
     if prompt := st.chat_input("질문을 입력하세요..."):
@@ -126,7 +126,7 @@ with tab1:
                 else:
                     answer = "지식 베이스가 오류로 인해 로드되지 않았습니다."
                     
-                st.markdown(answer)
+                st.markdown(answer, unsafe_allow_html=True)
                 st.session_state.messages.append({"role": "assistant", "content": answer})
 
 with tab2:
