@@ -97,6 +97,47 @@ st.markdown("""
     ::-webkit-scrollbar-thumb:hover {
         background: #0a3654; 
     }
+    
+    /* Force Light Theme on Expanders, Popups, and Inputs */
+    [data-testid="stExpander"] {
+        background-color: #ffffff !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 0.5rem !important;
+    }
+    [data-testid="stExpander"] details summary p {
+        color: #0E4B75 !important;
+        font-weight: 700 !important;
+    }
+    [data-testid="stExpander"] details {
+        background-color: #ffffff !important;
+    }
+    
+    /* Force Light Theme on Input Widgets (Sliders, Text Inputs, Buttons) */
+    div[data-baseweb="input"], 
+    div[data-baseweb="select"], 
+    div[data-baseweb="base-input"] {
+        background-color: #ffffff !important;
+        color: #1e1e1e !important;
+    }
+    
+    /* Force Light Theme on info/success/warning boxes */
+    [data-testid="stAlert"] {
+        background-color: #f8f9fa !important;
+        color: #1e1e1e !important;
+    }
+    
+    /* Ensure code blocks stay readable */
+    code {
+        color: #d63384 !important;
+        background-color: #f8f9fa !important;
+    }
+    pre code {
+        color: #212529 !important;
+        background-color: transparent !important;
+    }
+    div[data-testid="stCodeBlock"] {
+        background-color: #f8f9fa !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
