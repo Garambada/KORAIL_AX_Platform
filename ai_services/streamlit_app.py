@@ -74,57 +74,116 @@ def generate_solar_response(context: str, query: str) -> str:
     except Exception as e:
         return f"Solar Pro LLM 호출 중 에러가 발생했습니다: {str(e)}"
 
-st.title("🚆 KORAIL AX - 공통업무 AI")
-st.markdown("**'전철전력 실무보감'** (Upstage Solar Pro LLM)")
+st.title("🚆 KORAIL AX - 통합 플랫폼 PoC")
 
-with st.spinner("🧠 실무보감 지식 베이스(Vector DB)를 로딩 중입니다..."):
-    vectorstore = load_rag_engine()
-    
-if vectorstore:
-    st.success("✅ 실무보감 지식 베이스 로딩 완료!")
-else:
-    st.warning("⚠️ 지식 베이스를 로딩하지 못했습니다.")
+tab1, tab2 = st.tabs(["📑 공통업무 AI (RAG)", "📐 설계업무 AI (CAD 최적화)"])
 
-# 대화 기록 초기화
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-    # 초기 안내 메시지
-    st.session_state.messages.append({"role": "assistant", "content": "안녕하세요! Upstage Solar 기반 실무보감 어시스턴트입니다. 규정, 계약 등 어떤 것이든 물어보세요.\n\n*(예시: 설계변경 관리는 언제, 어떻게 해야 해?)*"})
-
-# 이전 대화 출력
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
-
-# 사용자 입력 처리
-if prompt := st.chat_input("질문을 입력하세요..."):
-    # 사용자 메시지 추가 및 출력
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
+with tab1:
+    st.markdown("### **'전철전력 실무보감'** (Upstage Solar Pro LLM)")
+    with st.spinner("🧠 실무보감 지식 베이스(Vector DB)를 로딩 중입니다..."):
+        vectorstore = load_rag_engine()
         
-    # AI 답변 처리
-    with st.chat_message("assistant"):
-        with st.spinner("지식 검색 및 답변 생성 중 (Solar Pro)..."):
-            if vectorstore:
-                # 1. 문서 검색 (Retrieval)
-                results = vectorstore.similarity_search(prompt, k=3)
-                if results:
-                    context = "\n\n".join([r.page_content for r in results])
-                    
-                    # 2. LLM 생성 (Generation)
-                    answer = generate_solar_response(context, prompt)
-                    
-                    # 3. 출처 표기 추가
-                    answer += "\n\n---\n*🔍 [검색된 참조 출처 요약]*\n"
-                    for idx, r in enumerate(results):
-                        snippet = r.page_content.replace('\n', ' ')[:100] + "..."
-                        answer += f"<small>**[{idx+1}]** {snippet}</small>\n\n"
-                        
+    if vectorstore:
+        st.success("✅ 실무보감 지식 베이스 로딩 완료!")
+    else:
+        st.warning("⚠️ 지식 베이스를 로딩하지 못했습니다.")
+    
+    # 대화 기록 초기화
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+        # 초기 안내 메시지
+        st.session_state.messages.append({"role": "assistant", "content": "안녕하세요! Upstage Solar 기반 실무보감 어시스턴트입니다. 규정, 계약 등 어떤 것이든 물어보세요.\n\n*(예시: 설계변경 관리는 언제, 어떻게 해야 해?)*"})
+    
+    # 이전 대화 출력
+    for msg in st.session_state.messages:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+    
+    # 사용자 입력 처리
+    if prompt := st.chat_input("질문을 입력하세요..."):
+        # 사용자 메시지 추가 및 출력
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+            
+        # AI 답변 처리
+        with st.chat_message("assistant"):
+            with st.spinner("지식 검색 및 답변 생성 중 (Solar Pro)..."):
+                if vectorstore:
+                    # 1. 문서 검색 (Retrieval)
+                    results = vectorstore.similarity_search(prompt, k=3)
+                    if results:
+                        context = "\n\n".join([r.page_content for r in results])
+                        # 2. LLM 생성 (Generation)
+                        answer = generate_solar_response(context, prompt)
+                        # 3. 출처 표기 추가
+                        answer += "\n\n---\n*🔍 [검색된 참조 출처 요약]*\n"
+                        for idx, r in enumerate(results):
+                            snippet = r.page_content.replace('\n', ' ')[:100] + "..."
+                            answer += f"<small>**[{idx+1}]** {snippet}</small>\n\n"
+                    else:
+                        answer = "해당하는 내용을 실무보감에서 찾을 수 없습니다."
                 else:
-                    answer = "해당하는 내용을 실무보감에서 찾을 수 없습니다."
-            else:
-                answer = "지식 베이스가 오류로 인해 로드되지 않았습니다."
+                    answer = "지식 베이스가 오류로 인해 로드되지 않았습니다."
+                    
+                st.markdown(answer)
+                st.session_state.messages.append({"role": "assistant", "content": answer})
+
+with tab2:
+    st.markdown("### 🔌 변전설비 2D 자동 최적 배치기")
+    st.markdown("AI(OR-Tools)가 **이격거리 규정**과 **겹침 방지** 제약을 준수하여 설비 패킹 좌표를 선출합니다.")
+    
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        st.markdown("**[시뮬레이션 공간 규격]**")
+        space_width = st.slider("가로 (Width, m)", 30, 80, 45, 5)
+        space_height = st.slider("세로 (Height, m)", 30, 80, 35, 5)
+    
+        st.markdown("**[최적화 대상 모델]**")
+        st.code('''[
+  {"name": "M_TR_150MVA", "w": 8, "h": 10, "clearance": 3},
+  {"name": "GIS_170kV", "w": 12, "h": 6, "clearance": 2},
+  {"name": "SWG_25.8kV", "w": 15, "h": 5, "clearance": 2},
+  {"name": "Condenser", "w": 5, "h": 5, "clearance": 1},
+  {"name": "ESS_Battery", "w": 10, "h": 8, "clearance": 2},
+  {"name": "Control_Panel", "w": 6, "h": 3, "clearance": 1}
+]''', language='json')
+        
+    with col2:
+        if st.button("🚀 AI 레이아웃 최적화 연산", type="primary"):
+            from design_ai_poc import optimize_layout, generate_cad_dxf
+            
+            equipment_specs = [
+                {"name": "M_TR_150MVA", "width": 8, "height": 10, "clearance": 3},
+                {"name": "GIS_170kV", "width": 12, "height": 6, "clearance": 2},
+                {"name": "SWG_25.8kV", "width": 15, "height": 5, "clearance": 2},
+                {"name": "Condenser", "width": 5, "height": 5, "clearance": 1},
+                {"name": "ESS_Battery", "width": 10, "height": 8, "clearance": 2},
+                {"name": "Control_Panel", "width": 6, "height": 3, "clearance": 1}
+            ]
+            
+            with st.spinner("SAT Solver 교차 검증 연산 중..."):
+                layout_result = optimize_layout(equipment_specs, space_width, space_height)
+            
+            if layout_result:
+                st.success(f"🎯 최적 좌표 도출 완료 (공간: {space_width}x{space_height})")
                 
-            st.markdown(answer)
-            st.session_state.messages.append({"role": "assistant", "content": answer})
+                # DXF 파일 생성 연동
+                output_dxf = "substation_layout.dxf"
+                if generate_cad_dxf(layout_result, output_dxf):
+                    import pandas as pd
+                    df = pd.DataFrame(layout_result)
+                    st.dataframe(df.set_index("name"), use_container_width=True)
+                    
+                    with open(output_dxf, "rb") as file:
+                        st.download_button(
+                            label="📄 2D CAD (DXF) 결과 다운로드",
+                            data=file,
+                            file_name="optimized_substation.dxf",
+                            mime="application/dxf",
+                        )
+                else:
+                    st.error("CAD 도면 생성 라이브러리 연동 실패")
+            else:
+                st.error(f"❌ 실패: 입력하신 면적({space_width}x{space_height}) 내에서는 해당 설비들을 안전거리 규정에 맞게 모두 배치할 수 없습니다. 공간(가로/세로)을 더 넓혀주세요.")
