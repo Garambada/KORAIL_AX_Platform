@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KRNA AI Transformation Platform</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Noise Overlay -->
+    <div class="noise-overlay"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">KRNA <span>AX.</span></div>
+        <nav class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#process">Process</a>
+            <a href="#metrics">Metrics</a>
+        </nav>
+        <button class="btn btn-outline">로그인</button>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero reveal">
+        <div class="hero-content">
+            <h1 class="hero-title">Engineering evolved by <br><span class="highlight">Intelligence.</span></h1>
+            <p class="hero-subtitle">전철전력 설계 및 시공의 새로운 기준. 복잡한 업무를 자동화하고 흩어진 데이터를 하나의 지능형 플랫폼으로 통합하여 혁신적인 AI 성숙도를 달성하세요.</p>
+            <div class="hero-cta">
+                <button class="btn btn-primary">Try Free Demo</button>
+                <button class="btn btn-secondary">Explore Platform</button>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="glass-card dashboard-card">
+                <div class="card-header">
+                    <h3>AI Maturity Index</h3>
+                    <span class="live-dot">Live</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="maturityChart"></canvas>
+                </div>
+                <div class="card-footer">
+                    <p>Current Score: <strong id="scoreVal">84</strong> / 100</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof Section -->
+    <section class="social-proof reveal">
+        <p class="section-label">TRUSTED BY INDUSTRY LEADERS</p>
+        <div class="logos">
+            <div class="logo-item">KRNA</div>
+            <div class="logo-item">KORAIL</div>
+            <div class="logo-item">POSCO Flow</div>
+            <div class="logo-item">KEPCO</div>
+            <div class="logo-item">HYUNDAI ROTEM</div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features reveal">
+        <div class="section-header">
+            <h2>Core Features</h2>
+            <p>6가지 핵심 기능으로 프로젝트 생애주기 전반을 최적화합니다.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="icon">🔍</div>
+                <h3>RAG 문서 질의응답</h3>
+                <p>수만 페이지의 시방서와 도면을 순식간에 검색하고 정확한 답변을 도출합니다.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📐</div>
+                <h3>2D 자동 레이아웃</h3>
+                <p>설비 파라미터 기반으로 안전이격거리를 준수하는 최적의 배치를 자동 생성합니다.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🛤️</div>
+                <h3>송전선로 3D 맵핑</h3>
+                <p>지형과 장애물을 고려한 가장 효율적인 송전 루트를 3D 환경에서 시각화합니다.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">✅</div>
+                <h3>시공 규격 교차 검증</h3>
+                <p>설계 도서와 시공 내역서 간의 불일치 항목을 AI가 자동으로 감지해냅니다.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🏛️</div>
+                <h3>BIM & 내진 시뮬레이션</h3>
+                <p>2D 도면의 3D화 및 물리엔진 기반 내진 안정성 시뮬레이션을 제공합니다.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🔥</div>
+                <h3>수명 예측 및 예지보전</h3>
+                <p>과부하와 열화상을 분석하여 기기 고장을 사전에 예측하고 경고합니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section (Dark) -->
+    <section id="process" class="process dark-section reveal">
+        <div class="section-header">
+            <h2>Transformation Process</h2>
+            <p>복잡함은 줄이고, 효율성은 극대화하는 4단계의 여정</p>
+        </div>
+        <div class="process-steps">
+            <div class="step">
+                <div class="step-num">01</div>
+                <h3>Data Ingestion</h3>
+                <p>기존의 도면, 내역서, PDF 문서를 플랫폼에 안전하게 업로드 및 디지털화합니다.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">02</div>
+                <h3>AI Analysis</h3>
+                <p>고성능 LLM과 OR-Tools가 데이터를 분석하여 최적의 파라미터를 계산합니다.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">03</div>
+                <h3>Visualization</h3>
+                <p>도출된 결과는 3D BIM, CAD, 대시보드로 즉시 렌더링되어 한눈에 파악할 수 있습니다.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">04</div>
+                <h3>Optimization</h3>
+                <p>교차 검증 및 예지 보전을 통해 설계부터 시공, 유지보수까지 리스크를 제로화합니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Metrics Section -->
+    <section id="metrics" class="metrics reveal">
+        <div class="section-header">
+            <h2>Proven Impact</h2>
+            <p>데이터가 증명하는 KRNA AX의 압도적 효율성</p>
+        </div>
+        <div class="metrics-container">
+            <div class="metric-item">
+                <h2 class="counter" data-target="3.2">0</h2><span class="suffix">x</span>
+                <p>업무 처리 속도 향상</p>
+            </div>
+            <div class="metric-item">
+                <h2 class="counter" data-target="67">0</h2><span class="suffix">%</span>
+                <p>설계 변경 및 오류 감소율</p>
+            </div>
+            <div class="metric-item">
+                <h2 class="counter" data-target="94">0</h2><span class="suffix">%</span>
+                <p>시방서 규격 적합도 달성</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta reveal">
+        <div class="cta-content">
+            <h2>Ready to Transform Your Infrastructure?</h2>
+            <p>최첨단 AI 에이전트와 함께 미래의 전철전력 시스템을 구축하세요.</p>
+            <button class="btn btn-primary btn-large">Request Free Demo</button>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="logo">KRNA <span>AX.</span></div>
+            <p>&copy; 2026 KRNA & KORAIL AI Transformation Project. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Custom Script -->
+    <script src="script.js"></script>
+</body>
+</html>
