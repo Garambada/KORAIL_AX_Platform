@@ -417,7 +417,7 @@ with tab2:
     with st.expander("✅ 설계-시공 규격 자동 교차 검증 (Design-Construction Spec Cross-validation)", expanded=False):
         st.write("설계도면(도면, 내역서)과 시공시방서를 비교 분석하여 누락, 불일치, 위반 항목을 자동으로 찾아냅니다.")
         
-        uploaded_file = st.file_upload("시공 내역서 업로드 (Excel/CSV mock)", type=["csv", "xlsx"], key="validation_upload")
+        uploaded_file = st.file_uploader("시공 내역서 업로드 (Excel/CSV mock)", type=["csv", "xlsx"], key="validation_upload")
         if st.button("🔍 AI 규격 검증 실행", key="btn_validation", type="secondary"):
             with st.spinner("KRNA 표준 시방서 데이터베이스와 교차 대조 중..."):
                 time.sleep(2)
