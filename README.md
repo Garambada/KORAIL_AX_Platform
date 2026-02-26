@@ -1,6 +1,6 @@
-# 🚆 KORAIL AX Platform (AI Services PoC)
+# 🚆 KRNA AX Platform (AI Services PoC)
 
-한국철도공사(KORAIL) 전철전력처의 AI 전환(AX)을 위한 핵심 과제(공통, 설계, 시공, SCADA) PoC 구현 레포지토리입니다.
+한국철도공사(KRNA) 전철전력처의 AI 전환(AX)을 위한 핵심 과제(공통, 설계, 시공, SCADA) PoC 구현 레포지토리입니다.
 
 ## 🚀 Module 01: 공통업무 AI (RAG 문서 어시스턴트)
 
@@ -15,7 +15,7 @@
 2.  우측 상단의 **"New app"** 버튼을 클릭합니다.
 3.  **"Use existing repo"** 를 선택합니다.
 4.  설정값을 아래와 같이 입력합니다:
-    *   **Repository:** `사용자아이디/KORAIL_AX_Platform`
+    *   **Repository:** `사용자아이디/KRNA_AX_Platform`
     *   **Branch:** `main`
     *   **Main file path:** `ai_services/streamlit_app.py`
 5.  **"Advanced settings"** 를 클릭하여 환경 변수(Secrets)를 설정합니다. 아래 텍스트 상자에 API 키를 붙여넣으세요:

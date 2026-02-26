@@ -11,7 +11,7 @@ from langchain.prompts import PromptTemplate
 # Set API Key securely in environment
 os.environ["UPSTAGE_API_KEY"] = "up_mK2h7yONqSmhFo8WfFIsr35B1hy83"
 
-st.set_page_config(page_title="KORAIL AX - 공통업무 AI (Powered by Solar Pro)", page_icon="🚆", layout="centered")
+st.set_page_config(page_title="KRNA AX - 공통업무 AI (Powered by Solar Pro)", page_icon="🚆", layout="centered")
 
 # Custom UI Styling (Professional GUI & Scrollable Container)
 st.markdown("""
@@ -40,7 +40,7 @@ st.markdown("""
     
     /* Professional Typography and Accent Colors */
     h1, h2, h3 {
-        color: #0E4B75 !important; /* KORAIL Blue */
+        color: #0E4B75 !important; /* KRNA Blue */
         font-family: 'Helvetica Neue', Arial, sans-serif !important;
         font-weight: 700 !important;
     }
@@ -113,10 +113,19 @@ st.markdown("""
     }
     
     /* Force Light Theme on Input Widgets (Sliders, Text Inputs, Buttons) */
-    div[data-baseweb="input"], 
-    div[data-baseweb="select"], 
-    div[data-baseweb="base-input"] {
+    div[data-baseweb="input"] > div, 
+    div[data-baseweb="select"] > div, 
+    div[data-baseweb="base-input"],
+    .stTextInput input, 
+    .stTextArea textarea,
+    .stSelectbox div[data-baseweb="select"] {
         background-color: #ffffff !important;
+        color: #1e1e1e !important;
+        -webkit-text-fill-color: #1e1e1e !important;
+    }
+    
+    /* Ensure markdown and regular text outside containers are also dark */
+    .stMarkdown p, .stMarkdown span {
         color: #1e1e1e !important;
     }
     
@@ -202,7 +211,8 @@ def generate_solar_response(context: str, query: str) -> str:
     except Exception as e:
         return f"Solar Pro LLM 호출 중 에러가 발생했습니다: {str(e)}"
 
-st.title("🚆 KORAIL AX - 통합 플랫폼 PoC")
+st.title("🚆 KRNA 전철전력 설계·시공 통합 AI 플랫폼")
+st.markdown("**Powered by Upstage Solar Pro3** | 📄 RAG 문서 대화 & 📐 AI 자동 설계 도면 생성")
 
 tab1, tab2 = st.tabs(["공통업무 AI (RAG)", "설계업무 AI (CAD 최적화)"])
 
@@ -317,7 +327,7 @@ with tab2:
                 st.error(f"❌ 실패: 입력하신 면적({space_width}x{space_height}) 내에서는 해당 설비들을 안전거리 규정에 맞게 모두 배치할 수 없습니다. 공간(가로/세로)을 더 넓혀주세요.")
 
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("### 🛠️ KORAIL 전철전력 설계업무 AI 확장 로드맵")
+    st.markdown("### 🛠️ KRNA 전철전력 설계업무 AI 확장 로드맵")
     st.info("💡 **아래 5가지 혁신적인 AI 모듈**이 플랫폼 고도화 2단계에서 순차적으로 탑재될 예정입니다.")
     
     with st.expander("🛤️ 송전선로 최적 노선 3D 맵핑 (Transmission Line Optimal Routing)", expanded=True):
