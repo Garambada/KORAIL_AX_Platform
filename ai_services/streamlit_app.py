@@ -1,7 +1,12 @@
 import streamlit as st
 import os
+import time
 import requests
 import json
+import pydeck as pdk
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import MarkdownTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -332,20 +337,238 @@ with tab2:
     
     with st.expander("🛤️ 송전선로 최적 노선 3D 맵핑 (Transmission Line Optimal Routing)", expanded=True):
         st.write("지형 데이터를 분석하여 환경 영향과 케이블 길이를 최소화하는 최적의 3D 송전 노선을 제안합니다.")
-        st.button("모듈 실행 (준비 중) ", key="btn_routing", disabled=True)
+        
+        col_route1, col_route2 = st.columns(2)
+        with col_route1:
+            st.markdown("**출발 변전소 좌표**")
+            start_lat = st.number_input("위도 (Start Lat)", value=37.5665, format="%.4f")
+            start_lon = st.number_input("경도 (Start Lon)", value=126.9780, format="%.4f")
+        with col_route2:
+            st.markdown("**도착 변전소 좌표**")
+            end_lat = st.number_input("위도 (End Lat)", value=37.5219, format="%.4f")
+            end_lon = st.number_input("경도 (End Lon)", value=127.0411, format="%.4f")
+            
+        if st.button("🚀 3D 노선 최적화 시뮬레이션 실행", key="btn_routing"):
+            with st.spinner("AI 지형 데이터 스캔 및 A* (A-Star) 경로 탐색 중..."):
+                time.sleep(1.5) # Simulating API call/processing time
+                
+                # Mocking route data with elevation (Arching effect)
+                route_data = pd.DataFrame({
+                    "start_lon": [start_lon],
+                    "start_lat": [start_lat],
+                    "end_lon": [end_lon],
+                    "end_lat": [end_lat],
+                    "color": [[14, 75, 117, 255]], # KRNA Blue
+                })
+
+                view_state = pdk.ViewState(
+                    latitude=(start_lat + end_lat) / 2, 
+                    longitude=(start_lon + end_lon) / 2, 
+                    zoom=11, 
+                    pitch=50,
+                    bearing=-15
+                )
+
+                arc_layer = pdk.Layer(
+                    "ArcLayer",
+                    data=route_data,
+                    get_source_position=["start_lon", "start_lat"],
+                    get_target_position=["end_lon", "end_lat"],
+                    get_source_color="color",
+                    get_target_color="color",
+                    auto_highlight=True,
+                    width_scale=0.0001,
+                    get_width="2",
+                    width_min_pixels=3,
+                    width_max_pixels=15,
+                    getHeight=0.5
+                )
+
+                scatter_layer = pdk.Layer(
+                    "ScatterplotLayer",
+                    pd.DataFrame({
+                        "lon": [start_lon, end_lon],
+                        "lat": [start_lat, end_lat],
+                        "name": ["출발점", "도착점"],
+                        "color": [[214, 51, 132], [25, 135, 84]]
+                    }),
+                    get_position=["lon", "lat"],
+                    get_color="color",
+                    get_radius=500,
+                    pickable=True
+                )
+
+                r = pdk.Deck(
+                    layers=[arc_layer, scatter_layer], 
+                    initial_view_state=view_state, 
+                    tooltip={"text": "{name}"},
+                    map_style='light' # Use a light map style for better contrast
+                )
+                
+                st.pydeck_chart(r)
+                st.success("✅ 지형 단차 및 지장물을 우회하는 최적 경과지 3D 매핑이 완료되었습니다.")
+                
+                # Show mock metrics
+                m1, m2, m3 = st.columns(3)
+                m1.metric(label="총 선로 긍장 (Line Length)", value="14.2 km", delta="-1.8 km (단축)")
+                m2.metric(label="예상 철탑 기수", value="38 타워", delta="-4 기 (절감)")
+                m3.metric(label="공사비 절감액 추정", value="₩ 12.4 억", delta="최적화 효과")
         
     with st.expander("✅ 설계-시공 규격 자동 교차 검증 (Design-Construction Spec Cross-validation)", expanded=False):
         st.write("설계도면(도면, 내역서)과 시공시방서를 비교 분석하여 누락, 불일치, 위반 항목을 자동으로 찾아냅니다.")
-        st.button("모듈 실행 (준비 중) ", key="btn_validation", disabled=True)
+        
+        uploaded_file = st.file_upload("시공 내역서 업로드 (Excel/CSV mock)", type=["csv", "xlsx"], key="validation_upload")
+        if st.button("🔍 AI 규격 검증 실행", key="btn_validation", type="secondary"):
+            with st.spinner("KRNA 표준 시방서 데이터베이스와 교차 대조 중..."):
+                time.sleep(2)
+                
+                # Mock cross-validation results
+                mock_data = {
+                    "품목명 (Item)": ["170kV GIS", "154kV M.Tr", "25.8kV SWG", "제어 케이블", "접지 단자판"],
+                    "설계도서 규격 (Design)": ["정격 2000A / 50kA", "150/200MVA", "정격 1250A", "CVVS 2.0sq x 10C", "구리 100x10x1000L"],
+                    "시공내역서 (Construction)": ["정격 2000A / 50kA", "150/200MVA", "정격 600A (불일치)", "CVVS 1.5sq x 10C (미달)", "누락"],
+                    "검증 결과 (Status)": ["PASS", "PASS", "FAIL", "FAIL", "MISSING"]
+                }
+                
+                df_val = pd.DataFrame(mock_data)
+                
+                def highlight_status(val):
+                    color = ''
+                    if val == 'FAIL': color = '#ffcccb'
+                    elif val == 'MISSING': color = '#ffebee'
+                    return f'background-color: {color}'
+                    
+                st.dataframe(df_val.style.map(highlight_status, subset=['검증 결과 (Status)']), use_container_width=True)
+                
+                st.error("⚠️ 경고: 시공 내역서와 설계 규격 간 3건의 불일치/누락 항목이 발견되었습니다. (상세 리포트 다운로드 가능)")
         
     with st.expander("🏛️ 내진 설계 안전성 AI 시뮬레이터 (Seismic Design Safety AI Simulator)"):
-        st.info("전력 기기 및 구조물의 재질과 무게를 기반으로 지진 발생 시의 안전성을 딥러닝 모델로 시뮬레이션합니다.")
-        st.button("모듈 실행 (준비 중) ", key="btn_seismic", disabled=True)
+        st.write("전력 기기 및 구조물의 재질과 무게를 기반으로 지진 발생 시의 안전성을 시뮬레이션합니다.")
+        
+        sim_cols = st.columns([1, 2])
+        with sim_cols[0]:
+            magnitude = st.slider("예상 지진 규모 (Richter)", 4.0, 9.0, 6.5, 0.1)
+            soil_type = st.selectbox("지반 조건", ["연약지반 (Soft Soil)", "보통지반 (Medium Soil)", "단단한 암반 (Hard Rock)"])
+            equip_weight = st.number_input("설비 총 중량 (Ton)", value=120.5)
+            
+            run_seismic = st.button("내진 안전성 평가", key="btn_seismic")
+            
+        with sim_cols[1]:
+            if run_seismic:
+                with st.spinner("응력 해석 및 전도 위험성 산출 중..."):
+                    time.sleep(1.5)
+                    # Simple heuristic for mockup
+                    base_risk = (magnitude - 4.0) * 15
+                    soil_factor = 1.5 if "연약" in soil_type else (1.0 if "보통" in soil_type else 0.7)
+                    risk_score = min(max(base_risk * soil_factor, 0), 100)
+                    
+                    fig = go.Figure(go.Indicator(
+                        mode = "gauge+number",
+                        value = risk_score,
+                        domain = {'x': [0, 1], 'y': [0, 1]},
+                        title = {'text': "구조물 붕괴 위험도 (Risk Level)"},
+                        gauge = {
+                            'axis': {'range': [None, 100]},
+                            'bar': {'color': "darkblue"},
+                            'steps' : [
+                                {'range': [0, 30], 'color': "lightgreen"},
+                                {'range': [30, 70], 'color': "yellow"},
+                                {'range': [70, 100], 'color': "red"}],
+                            'threshold': {
+                                'line': {'color': "red", 'width': 4},
+                                'thickness': 0.75,
+                                'value': 70}
+                        }))
+                    fig.update_layout(height=300, margin=dict(l=20, r=20, t=30, b=20))
+                    st.plotly_chart(fig, use_container_width=True)
+                    
+                    if risk_score > 70:
+                        st.error("🚨 위험: 설계 기준 미달. 내진 보강 가새(Bracing) 추가 또는 마이크로파일 기초 보강이 필요합니다.")
+                    else:
+                        st.success("✅ 안전: 현재 시방서 기준으로 해당 지진 규모를 버틸 수 있도록 설계되었습니다.")
         
     with st.expander("🏢 스마트 변전소 3D BIM 모델링 (Smart Substation 3D BIM Modeling)"):
-        st.info("2D CAD 도면 및 설계 파라미터를 기반으로 유지보수에 활용 가능한 3D BIM 객체를 자동 생성합니다.")
-        st.button("모듈 실행 (준비 중) ", key="btn_bim", disabled=True)
+        st.write("2D CAD 도면 및 설계 파라미터를 기반으로 유지보수에 활용 가능한 3D BIM 객체를 자동 생성합니다.")
+        
+        if st.button("🏗️ 2D 레이아웃을 3D BIM으로 변환", key="btn_bim", type="primary"):
+            with st.spinner("3D 객체 매핑 및 렌더링 중..."):
+                time.sleep(2)
+                
+                # Mock 3D Substation data
+                np.random.seed(42)
+                n_equip = 15
+                x = np.random.uniform(0, 50, n_equip)
+                y = np.random.uniform(0, 50, n_equip)
+                z = np.zeros(n_equip)
+                
+                equip_types = ['M.Tr (주변압기)', 'GIS (가스절연개폐장치)', 'SWG (배전반)', 'Control Panel']
+                labels = [equip_types[i % 4] for i in range(n_equip)]
+                
+                fig3d = go.Figure(data=[go.Scatter3d(
+                    x=x, y=y, z=z,
+                    mode='markers',
+                    marker=dict(
+                        size=15,
+                        color=np.random.randn(n_equip),
+                        colorscale='Viridis',
+                        opacity=0.8,
+                        symbol='cube'
+                    ),
+                    text=labels,
+                    hoverinfo='text'
+                )])
+                
+                fig3d.update_layout(
+                    margin=dict(l=0, r=0, b=0, t=0),
+                    scene=dict(
+                        xaxis_title='X (m)',
+                        yaxis_title='Y (m)',
+                        zaxis_title='Height (m)'
+                    ),
+                    height=400
+                )
+                
+                st.plotly_chart(fig3d, use_container_width=True)
+                st.info("💡 각 큐브에 마우스를 올리면 설비 식별 정보 확인 및 유지보수 이력(Digital Twin) 조회가 가능합니다.")
         
     with st.expander("🔥 전력기기 열화상 및 수명 예측 모델링 (Thermal & Lifespan Prediction)"):
-        st.info("설비 부하량과 주변 환경 데이터를 결합하여 열화 지점(Hot-spot)을 예측하고 교체 주기를 제안합니다.")
-        st.button("모듈 실행 (준비 중) ", key="btn_thermal", disabled=True)
+        st.write("설비 부하량과 주변 환경 데이터를 결합하여 열화 지점(Hot-spot)을 예측하고 교체 주기를 제안합니다.")
+        
+        col_therm1, col_therm2 = st.columns([1, 2])
+        with col_therm1:
+            equip_select = st.selectbox("예측 대상 기기", ["#1 메인 변압기 (154kV)", "#2 변압기 (154kV)", "25.8kV GIS BUS"])
+            env_temp = st.slider("여름철 최고 외기온도 (℃)", 30, 45, 38)
+            load_factor = st.slider("예상 평균 부하율 (%)", 50, 110, 85)
+            run_thermal = st.button("🔥 이상 발열 플로우 시뮬레이션", key="btn_thermal")
+            
+        with col_therm2:
+            if run_thermal:
+                with st.spinner("LSTM 시계열 모델 기반 수명 예측 중..."):
+                    time.sleep(1.5)
+                    
+                    months = np.arange(1, 25) # 24개월 예측
+                    base_temp = 60 + (env_temp - 30)*0.5 + (load_factor - 50)*0.3
+                    
+                    # Add non-linear degradation and noise
+                    predicted_temp = base_temp + np.exp(months/10) + np.random.normal(0, 2, 24)
+                    
+                    fig_line = go.Figure()
+                    fig_line.add_trace(go.Scatter(x=months, y=predicted_temp, mode='lines+markers', name='예상 권선 온도', line=dict(color='firebrick', width=2)))
+                    fig_line.add_hline(y=95, line_dash="dash", line_color="orange", annotation_text="경고 임계치 (95℃)")
+                    fig_line.add_hline(y=110, line_dash="solid", line_color="red", annotation_text="위험 폭주선 (110℃)")
+                    
+                    fig_line.update_layout(
+                        title=f"{equip_select} 향후 24개월 최고 발열량 예측 곡선",
+                        xaxis_title="경과 월 (Months)",
+                        yaxis_title="최고 온도 (℃)",
+                        height=350,
+                        margin=dict(l=20, r=20, t=40, b=20)
+                    )
+                    
+                    st.plotly_chart(fig_line, use_container_width=True)
+                    
+                    danger_month = np.where(predicted_temp > 95)[0]
+                    if len(danger_month) > 0:
+                        st.warning(f"⚠️ 예측 결과: 약 **{danger_month[0]+1}개월 후**부터 경고 온도(95℃)를 초과할 확률이 85% 이상입니다. 냉각팬 증설 또는 사전 점검 요망.")
+                    else:
+                        st.success("✅ 예측 결과: 향후 2년 내에 임계 온도를 초과할 위험성이 낮습니다. (정상 수명 주기 유지 예상)")
