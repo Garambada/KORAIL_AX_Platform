@@ -26,6 +26,17 @@ st.markdown("""
         background-color: #f8fafc !important;
     }
     
+    /* Sidebar Force Light Theme */
+    section[data-testid="stSidebar"] {
+        background-color: #f1f5f9 !important;
+    }
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] div,
+    section[data-testid="stSidebar"] label {
+        color: #0f172a !important;
+    }
+    
     /* Global Text Color Fix for Light Mode */
     p, span, div, li, strong, em {
         color: #1e293b !important;
@@ -206,7 +217,7 @@ st.markdown("**Powered by Upstage Solar Pro3** | 📄 RAG 문서 대화 & 📐 A
 with st.sidebar:
     st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Korail_logo.svg/1024px-Korail_logo.svg.png", width=150)
     st.markdown("### 메뉴 선택")
-    menu = st.radio("", ["공통업무 AI (RAG)", "설계업무 AI (CAD 최적화)"])
+    menu = st.radio("메뉴", ["공통업무 AI (RAG)", "설계업무 AI (CAD 최적화)"], label_visibility="collapsed")
 
 if menu == "공통업무 AI (RAG)":
     st.markdown("### **'전철전력 법령/예규'** (Upstage Solar Pro LLM)")
