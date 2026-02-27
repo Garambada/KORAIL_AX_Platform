@@ -147,23 +147,17 @@ def load_rag_engine():
     try:
         # Streamlit Cloud 경로 문제 해결을 위해 절대 경로 확보
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        doc_path = os.path.join(base_dir, "data_real") # 실제 법령 데이터 폴더로 교체
+        index_path = os.path.join(base_dir, "faiss_index") 
         
-        if not os.path.exists(doc_path):
-            st.error(f"오류: 문서 폴더를 찾을 수 없습니다. 경로: {doc_path}")
+        if not os.path.exists(index_path):
+            st.error(f"오류: 미리 빌드된 FAISS 인덱스 폴더를 찾을 수 없습니다. (먼저 rag_poc.py를 실행하세요.) 경로: {index_path}")
             return None
             
-        # 1. 로드 (PDF 디렉토리 로더 사용)
-        pdf_loader = DirectoryLoader(doc_path, glob="**/*.pdf", loader_cls=PyPDFLoader)
-        docs = pdf_loader.load()
-        
-        # 2. 청크 분할 (PDF용 텍스트 분할기 사용)
-        splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-        chunks = splitter.split_documents(docs)
-        
-        # 3. 임베딩 및 인덱싱
+        # 임베딩 모델 로드 (저장할 때와 동일한 모델 사용)
         embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        vectorstore = FAISS.from_documents(chunks, embeddings)
+        
+        # 미리 저장된 FAISS 인덱스 빠른 로드
+        vectorstore = FAISS.load_local(index_path, embeddings, allow_dangerous_deserialization=True)
         return vectorstore
     except Exception as e:
         import traceback
