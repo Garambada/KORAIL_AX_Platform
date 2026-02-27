@@ -21,21 +21,9 @@ st.set_page_config(page_title="KRNA AX - 공통업무 AI (Powered by Solar Pro)"
 # Custom UI Styling (Professional GUI & Scrollable Container)
 st.markdown("""
 <style>
-    /* Hide main scrollbar and constrain height */
+    /* App Background Color */
     html, body, [data-testid="stAppViewContainer"] {
-        overflow: hidden !important;
-        height: 100vh;
-        margin: 0;
-        padding: 0;
         background-color: #f8f9fa !important;
-    }
-    
-    /* Make the workspace scrollable instead of the page */
-    [data-testid="stMainBlockContainer"] {
-        overflow-y: auto !important;
-        height: calc(100vh - 150px) !important;
-        padding-top: 2rem !important;
-        padding-bottom: 5rem !important;
     }
     
     /* Global Text Color Fix for Light Mode */
