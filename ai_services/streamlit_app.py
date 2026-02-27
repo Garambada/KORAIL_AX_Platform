@@ -118,21 +118,26 @@ st.markdown("""
         background-color: #ffffff !important;
     }
     
-    /* Ensure code blocks stay readable */
-    code {
-        color: #db2777 !important;
-        background-color: #f1f5f9 !important;
-        padding: 0.2rem 0.4rem !important;
-        border-radius: 0.25rem !important;
+    /* Ensure code blocks stay readable (Message Window) */
+    code, .stCodeBlock code {
+        color: #0f172a !important;
+        background-color: #ffffff !important;
     }
     pre code {
-        color: #334155 !important;
+        color: #0f172a !important;
         background-color: transparent !important;
     }
     div[data-testid="stCodeBlock"] {
-        background-color: #f8fafc !important;
+        background-color: #ffffff !important;
         border: 1px solid #e2e8f0 !important;
         border-radius: 0.5rem !important;
+    }
+    
+    /* Alerts and Messages (Light theme enforcement) */
+    [data-testid="stAlert"] {
+        background-color: #f1f5f9 !important;
+        border-left: 4px solid #0E4B75 !important;
+        color: #0f172a !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -203,15 +208,19 @@ def generate_solar_response(context: str, query: str) -> str:
 st.title("🚆 KRNA 전철전력 설계·시공 통합 AI 플랫폼")
 st.markdown("**Powered by Upstage Solar Pro3** | 📄 RAG 문서 대화 & 📐 AI 자동 설계 도면 생성")
 
-tab1, tab2 = st.tabs(["공통업무 AI (RAG)", "설계업무 AI (CAD 최적화)"])
+# Replace tabs with Sidebar Navigation to fix chat_input constraint
+with st.sidebar:
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Korail_logo.svg/1024px-Korail_logo.svg.png", width=150)
+    st.markdown("### 메뉴 선택")
+    menu = st.radio("", ["공통업무 AI (RAG)", "설계업무 AI (CAD 최적화)"])
 
-with tab1:
-    st.markdown("### **'전철전력 실무보감'** (Upstage Solar Pro LLM)")
-    with st.spinner("🧠 실무보감 지식 베이스(Vector DB)를 로딩 중입니다..."):
+if menu == "공통업무 AI (RAG)":
+    st.markdown("### **'전철전력 법령/예규'** (Upstage Solar Pro LLM)")
+    with st.spinner("🧠 법령/예규 지식 베이스(Vector DB)를 로딩 중입니다..."):
         vectorstore = load_rag_engine()
         
     if vectorstore:
-        st.toast("✅ 실무보감 지식 베이스 로딩 완료!")
+        st.toast("✅ 지식 베이스 로딩 완료!")
     else:
         st.warning("⚠️ 지식 베이스를 로딩하지 못했습니다.")
     
@@ -226,7 +235,7 @@ with tab1:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"], unsafe_allow_html=True)
     
-    # 사용자 입력 처리
+    # 사용자 입력 처리 (Must be outside of tabs/columns)
     if prompt := st.chat_input("질문을 입력하세요..."):
         # 사용자 메시지 추가 및 출력
         st.session_state.messages.append({"role": "user", "content": prompt})
@@ -258,7 +267,7 @@ with tab1:
                 st.markdown(answer, unsafe_allow_html=True)
                 st.session_state.messages.append({"role": "assistant", "content": answer})
 
-with tab2:
+elif menu == "설계업무 AI (CAD 최적화)":
     st.markdown("### 🔌 변전설비 2D 자동 최적 배치기")
     st.markdown("AI(OR-Tools)가 **이격거리 규정**과 **겹침 방지** 제약을 준수하여 설비 패킹 좌표를 선출합니다.")
     
