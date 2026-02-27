@@ -16,96 +16,69 @@ from langchain.prompts import PromptTemplate
 # Set API Key securely in environment
 os.environ["UPSTAGE_API_KEY"] = "up_mK2h7yONqSmhFo8WfFIsr35B1hy83"
 
-st.set_page_config(page_title="KRNA AX - 공통업무 AI (Powered by Solar Pro)", page_icon="🚆", layout="centered")
+st.set_page_config(page_title="KRNA AX - 공통업무 AI (Powered by Solar Pro)", page_icon="🚆", layout="wide")
 
 # Custom UI Styling (Professional GUI & Scrollable Container)
 st.markdown("""
 <style>
     /* App Background Color */
     html, body, [data-testid="stAppViewContainer"] {
-        background-color: #f8f9fa !important;
+        background-color: #f8fafc !important;
     }
     
     /* Global Text Color Fix for Light Mode */
     p, span, div, li, strong, em {
-        color: #1e1e1e !important;
+        color: #1e293b !important;
     }
     
     /* Professional Typography and Accent Colors */
     h1, h2, h3 {
-        color: #0E4B75 !important; /* KRNA Blue */
-        font-family: 'Helvetica Neue', Arial, sans-serif !important;
-        font-weight: 700 !important;
+        color: #0f172a !important; 
+        font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif !important;
+        font-weight: 800 !important;
+        letter-spacing: -0.02em;
     }
     
-    /* Chat message container refinements */
-    [data-testid="stChatMessage"] {
-        padding: 1rem;
-        border-radius: 0.5rem;
+    /* Modern Header */
+    header[data-testid="stHeader"] {
         background-color: #ffffff !important;
-        border: 1px solid #dee2e6 !important;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-bottom: 1px solid #e2e8f0 !important;
+    }
+    
+    /* Chat message container refinements (Modern UI) */
+    [data-testid="stChatMessage"] {
+        padding: 1.5rem;
+        border-radius: 1rem;
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
     }
     
     /* Make the main tab buttons larger and more prominent */
     [data-baseweb="tab"] {
-        font-size: 1.2rem !important;
-        font-weight: 800 !important;
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
+        font-size: 1.1rem !important;
+        font-weight: 700 !important;
+        padding: 1rem 1.5rem !important;
         background-color: transparent !important;
+        border-radius: 0.5rem 0.5rem 0 0 !important;
     }
     
     button[data-baseweb="tab"] p {
-        font-size: 1.25rem !important;
-        font-weight: 700 !important;
-        color: #495057 !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        color: #64748b !important;
     }
     
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background-color: #e2e8f0 !important;
+    }
     button[data-baseweb="tab"][aria-selected="true"] p {
-        color: #0E4B75 !important;
+        color: #0f172a !important;
+        font-weight: 800 !important;
     }
     
-    /* Input box floating at bottom */
-    [data-testid="stBottom"] {
-        background-color: white !important;
-        border-top: 1px solid #e9ecef;
-    }
-    
-    /* Visible Custom Scrollbar for Mac/Windows */
-    ::-webkit-scrollbar {
-        width: 12px;
-        height: 12px;
-    }
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1; 
-        border-radius: 8px;
-    }
-    ::-webkit-scrollbar-thumb {
-        background: #0E4B75; 
-        border-radius: 8px;
-        border: 2px solid #f1f1f1;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-        background: #0a3654; 
-    }
-    
-    /* Force Light Theme on Expanders, Popups, and Inputs */
-    [data-testid="stExpander"] {
-        background-color: #ffffff !important;
-        border: 1px solid #dee2e6 !important;
-        border-radius: 0.5rem !important;
-    }
-    [data-testid="stExpander"] details summary p {
-        color: #0E4B75 !important;
-        font-weight: 700 !important;
-    }
-    [data-testid="stExpander"] details {
-        background-color: #ffffff !important;
-    }
-    
-    /* Force Light Theme on Input Widgets (Sliders, Text Inputs, Buttons) */
+    /* Clean Input Widgets (Sliders, Text Inputs, Buttons) */
     div[data-baseweb="input"] > div, 
     div[data-baseweb="select"] > div, 
     div[data-baseweb="base-input"],
@@ -113,32 +86,53 @@ st.markdown("""
     .stTextArea textarea,
     .stSelectbox div[data-baseweb="select"] {
         background-color: #ffffff !important;
-        color: #1e1e1e !important;
-        -webkit-text-fill-color: #1e1e1e !important;
+        color: #1e293b !important;
+        -webkit-text-fill-color: #1e293b !important;
+        border-radius: 0.5rem !important;
+        border: 1px solid #cbd5e1 !important;
     }
     
-    /* Ensure markdown and regular text outside containers are also dark */
-    .stMarkdown p, .stMarkdown span {
-        color: #1e1e1e !important;
+    /* Button Hover Effects */
+    .stButton > button {
+        border-radius: 0.5rem !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+    }
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
     }
     
-    /* Force Light Theme on info/success/warning boxes */
-    [data-testid="stAlert"] {
-        background-color: #f8f9fa !important;
-        color: #1e1e1e !important;
+    /* Force Light Theme on Expanders */
+    [data-testid="stExpander"] {
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 0.75rem !important;
+        box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05);
+    }
+    [data-testid="stExpander"] details summary p {
+        color: #0f172a !important;
+        font-weight: 700 !important;
+    }
+    [data-testid="stExpander"] details {
+        background-color: #ffffff !important;
     }
     
     /* Ensure code blocks stay readable */
     code {
-        color: #d63384 !important;
-        background-color: #f8f9fa !important;
+        color: #db2777 !important;
+        background-color: #f1f5f9 !important;
+        padding: 0.2rem 0.4rem !important;
+        border-radius: 0.25rem !important;
     }
     pre code {
-        color: #212529 !important;
+        color: #334155 !important;
         background-color: transparent !important;
     }
     div[data-testid="stCodeBlock"] {
-        background-color: #f8f9fa !important;
+        background-color: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 0.5rem !important;
     }
 </style>
 """, unsafe_allow_html=True)
