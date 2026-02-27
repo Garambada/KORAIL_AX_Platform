@@ -115,3 +115,4 @@ uvicorn==0.39.0
 yarl==1.22.0
 zipp==3.23.0
 zstandard==0.25.0
+pypdf==4.1.0

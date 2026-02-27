@@ -7,8 +7,8 @@ import pydeck as pdk
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-from langchain_community.document_loaders import TextLoader
-from langchain_text_splitters import MarkdownTextSplitter
+from langchain_community.document_loaders import TextLoader, DirectoryLoader, PyPDFLoader
+from langchain_text_splitters import MarkdownTextSplitter, RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
@@ -160,18 +160,20 @@ def load_rag_engine():
     try:
         # Streamlit Cloud 경로 문제 해결을 위해 절대 경로 확보
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        doc_path = os.path.join(base_dir, "실무보감_전철전력.md") # 전체 원본 문서로 교체
+        doc_path = os.path.join(base_dir, "data_real") # 실제 법령 데이터 폴더로 교체
         
         if not os.path.exists(doc_path):
-            st.error(f"오류: 문서를 찾을 수 없습니다. 경로: {doc_path}")
+            st.error(f"오류: 문서 폴더를 찾을 수 없습니다. 경로: {doc_path}")
             return None
             
-        # 1. 로드
-        loader = TextLoader(doc_path, encoding="utf-8")
-        docs = loader.load()
-        # 2. 청크 분할
-        splitter = MarkdownTextSplitter(chunk_size=500, chunk_overlap=50)
+        # 1. 로드 (PDF 디렉토리 로더 사용)
+        pdf_loader = DirectoryLoader(doc_path, glob="**/*.pdf", loader_cls=PyPDFLoader)
+        docs = pdf_loader.load()
+        
+        # 2. 청크 분할 (PDF용 텍스트 분할기 사용)
+        splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
         chunks = splitter.split_documents(docs)
+        
         # 3. 임베딩 및 인덱싱
         embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
         vectorstore = FAISS.from_documents(chunks, embeddings)
@@ -191,7 +193,7 @@ def generate_solar_response(context: str, query: str) -> str:
     
     prompt = f"""당신은 한국철도공사(KORAIL) 전철전력 전문가이자 AI 어시스턴트입니다.
 반드시 제공된 [참조 내용]만을 근거로 사용자의 [질문]에 상세하고 친절하게 답변해주세요.
-참조 내용에 해당하는 정보가 없다면 "제공된 문서(실무보감)에서는 해당 내용을 찾을 수 없습니다."라고 솔직하게 답변하세요.
+참조 내용에 해당하는 정보가 없다면 "제공된 문서(법령/내규)에서는 해당 내용을 찾을 수 없습니다."라고 솔직하게 답변하세요.
 
 [참조 내용]
 {context}
@@ -235,7 +237,7 @@ with tab1:
     if "messages" not in st.session_state:
         st.session_state.messages = []
         # 초기 안내 메시지
-        st.session_state.messages.append({"role": "assistant", "content": "안녕하세요! Upstage Solar 기반 실무보감 어시스턴트입니다. 규정, 계약 등 어떤 것이든 물어보세요.\n\n*(예시: 설계변경 관리는 언제, 어떻게 해야 해?)*"})
+        st.session_state.messages.append({"role": "assistant", "content": "안녕하세요! Upstage Solar 기반 법령/내규 챗봇 어시스턴트입니다. 규정, 계약 등 어떤 것이든 물어보세요.\n\n*(예시: 전기안전관리자의 직무는 어떻게 되나요?)*"})
     
     # 이전 대화 출력
     for msg in st.session_state.messages:
@@ -262,10 +264,12 @@ with tab1:
                         # 3. 출처 표기 추가
                         answer += "\n\n---\n*🔍 [검색된 참조 출처 요약]*\n"
                         for idx, r in enumerate(results):
+                            source_file = r.metadata.get('source', '알 수 없는 파일').split('/')[-1]
+                            page_num = r.metadata.get('page', '알 수 없음')
                             snippet = r.page_content.replace('\n', ' ')[:100] + "..."
-                            answer += f"<small>**[{idx+1}]** {snippet}</small>\n\n"
+                            answer += f"<small>**[{idx+1}] {source_file} (페이지 {page_num})**<br>{snippet}</small>\n\n"
                     else:
-                        answer = "해당하는 내용을 실무보감에서 찾을 수 없습니다."
+                        answer = "해당하는 내용을 제공된 문서에서 찾을 수 없습니다."
                 else:
                     answer = "지식 베이스가 오류로 인해 로드되지 않았습니다."
                     
